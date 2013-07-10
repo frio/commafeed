@@ -98,7 +98,8 @@ public class FeedRefreshWorker {
 		try {
 			FetchedFeed fetchedFeed = fetcher.fetch(feed.getUrl(), false,
 					feed.getLastModifiedHeader(), feed.getEtagHeader(),
-					feed.getLastPublishedDate(), feed.getLastContentHash());
+					feed.getLastPublishedDate(), feed.getLastContentHash(),
+                    feed.getCredentials());
 			// stops here if NotModifiedException or any other exception is
 			// thrown
 			List<FeedEntry> entries = fetchedFeed.getEntries();

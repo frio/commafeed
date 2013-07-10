@@ -19,6 +19,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.Credentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
@@ -30,6 +31,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
@@ -68,7 +70,7 @@ public class HttpGetter {
 
 	public HttpResult getBinary(String url, int timeout) throws ClientProtocolException,
 			IOException, NotModifiedException {
-		return getBinary(url, null, null, timeout);
+		return getBinary(url, null, null, timeout, null);
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class HttpGetter {
 	 * @throws NotModifiedException
 	 *             if the url hasn't changed since we asked for it last time
 	 */
-	public HttpResult getBinary(String url, String lastModified, String eTag, int timeout)
+	public HttpResult getBinary(String url, String lastModified, String eTag, int timeout, Credentials credentials)
 			throws ClientProtocolException, IOException, NotModifiedException {
 		HttpResult result = null;
 		long start = System.currentTimeMillis();
@@ -98,6 +100,9 @@ public class HttpGetter {
 			httpget.addHeader(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_NO_CACHE);
 			httpget.addHeader(HttpHeaders.USER_AGENT, USER_AGENT);
 
+            if (credentials != null) {
+                httpget.addHeader(BasicScheme.authenticate(credentials, "US-ASCII", false));
+            }
 			if (lastModified != null) {
 				httpget.addHeader(HttpHeaders.IF_MODIFIED_SINCE, lastModified);
 			}

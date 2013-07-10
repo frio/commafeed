@@ -84,7 +84,7 @@ public class OPMLImporter {
 			// make sure we continue with the import process even a feed failed
 			try {
 				feedSubscriptionService.subscribe(user, outline.getXmlUrl(), title,
-						parent);
+                        null, null, parent);
 
 			} catch (FeedSubscriptionException e) {
 				throw e;

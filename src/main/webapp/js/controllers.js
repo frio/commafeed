@@ -62,7 +62,9 @@ function($scope, FeedService, CategoryService, MobileService) {
 			$scope.state = 'loading';
 			$scope.sub.title = 'Loading...';
 			FeedService.fetch({
-				url : $scope.sub.url
+				url : $scope.sub.url,
+				username : $scope.sub.username,
+				password : $scope.sub.password
 			}, function(data) {
 				$scope.state = 'ok';
 				$scope.sub.title = data.title;

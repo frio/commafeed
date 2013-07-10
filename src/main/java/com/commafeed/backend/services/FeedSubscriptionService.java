@@ -60,7 +60,7 @@ public class FeedSubscriptionService {
 	CacheService cache;
 
 	public Feed subscribe(User user, String url, String title,
-			FeedCategory category) {
+                          String username, String password, FeedCategory category) {
 
 		final String pubUrl = applicationSettingsService.get().getPublicUrl();
 		if (StringUtils.isBlank(pubUrl)) {
@@ -72,7 +72,7 @@ public class FeedSubscriptionService {
 					"Could not subscribe to a feed from this CommaFeed instance");
 		}
 
-		Feed feed = feedService.findOrCreate(url);
+		Feed feed = feedService.findOrCreate(url, username, password);
 
 		FeedSubscription sub = feedSubscriptionDAO.findByFeed(user, feed);
 		boolean newSubscription = false;

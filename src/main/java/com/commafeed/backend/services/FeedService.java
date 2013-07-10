@@ -21,8 +21,13 @@ public class FeedService {
 	@Inject
 	FeedSubscriptionDAO feedSubscriptionDAO;
 
+    @Lock(LockType.WRITE)
+    public Feed findOrCreate(String url) {
+        return this.findOrCreate(url, null, null);
+    }
+
 	@Lock(LockType.WRITE)
-	public Feed findOrCreate(String url) {
+	public Feed findOrCreate(String url, String username, String password) {
 		Feed feed = feedDAO.findByUrl(url);
 		if (feed == null) {
 			String normalized = FeedUtils.normalizeURL(url);
@@ -31,6 +36,8 @@ public class FeedService {
 			feed.setUrlHash(DigestUtils.sha1Hex(url));
 			feed.setNormalizedUrl(normalized);
 			feed.setNormalizedUrlHash(DigestUtils.sha1Hex(normalized));
+            feed.setUsername(username);
+            feed.setPassword(password);
 			feedDAO.saveOrUpdate(feed);
 		}
 		return feed;

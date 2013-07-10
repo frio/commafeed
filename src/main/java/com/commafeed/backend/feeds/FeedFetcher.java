@@ -7,6 +7,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,18 +34,18 @@ public class FeedFetcher {
 
 	public FetchedFeed fetch(String feedUrl, boolean extractFeedUrlFromHtml,
 			String lastModified, String eTag, Date lastPublishedDate,
-			String lastContentHash) throws FeedException,
+			String lastContentHash, Credentials credentials) throws FeedException,
 			ClientProtocolException, IOException, NotModifiedException {
 		log.debug("Fetching feed {}", feedUrl);
 		FetchedFeed fetchedFeed = null;
 
 		int timeout = 20000;
-		HttpResult result = getter.getBinary(feedUrl, lastModified, eTag, timeout);
+		HttpResult result = getter.getBinary(feedUrl, lastModified, eTag, timeout, credentials);
 		if (extractFeedUrlFromHtml) {
 			String extractedUrl = extractFeedUrl(
 					StringUtils.newStringUtf8(result.getContent()), feedUrl);
 			if (org.apache.commons.lang.StringUtils.isNotBlank(extractedUrl)) {
-				result = getter.getBinary(extractedUrl, lastModified, eTag, timeout);
+				result = getter.getBinary(extractedUrl, lastModified, eTag, timeout, credentials);
 				feedUrl = extractedUrl;
 			}
 		}

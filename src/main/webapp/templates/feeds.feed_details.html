@@ -15,6 +15,7 @@
 				<a href="{{sub.feedLink}}" target="_blank">{{sub.feedLink}}</a>
 			</div>
 		</div>
+
 		<div class="control-group" ng-class="{error : !form.name.$valid}">
 			<label class="control-label">${details.name}</label>
 			<div class="controls">
@@ -22,6 +23,22 @@
 				<span class="help-block" ng-show="!form.name.$valid">${global.required}</span>
 			</div>
 		</div>
+
+        <div class="control-group" ng-class="{error : !form.username.$valid}">
+            <label class="control-label">${details.username}</label>
+            <div class="controls">
+                <input type="text" name="username" ng-model="sub.username" class="input-block-level"></input>
+                <span class="help-block" ng-show="!form.username.$valid">lol don't look at this</span>
+            </div>
+        </div>
+
+        <div class="control-group" ng-class="{error : !form.password.$valid}">
+            <label class="control-label">${details.password}</label>
+            <div class="controls">
+                <input type="text" name="password" ng-model="sub.password" class="input-block-level"></input>
+                <span class="help-block" ng-show="!form.password.$valid">OH NO</span>
+            </div>
+        </div>
 
 		<div class="control-group" ng-class="{error : !form.category.$valid}">
 			<label class="control-label">${details.category}</label>

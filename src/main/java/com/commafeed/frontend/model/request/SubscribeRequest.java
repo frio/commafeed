@@ -24,6 +24,12 @@ public class SubscribeRequest implements Serializable {
 	@ApiProperty(value = "id of the user category to place the feed in")
 	private String categoryId;
 
+    @ApiProperty(value = "BASIC auth username for the feed", required = false)
+    private String username;
+
+    @ApiProperty(value = "BASIC auth password for the feed", required = false)
+    private String password;
+
 	public String getUrl() {
 		return url;
 	}
@@ -48,4 +54,19 @@ public class SubscribeRequest implements Serializable {
 		this.categoryId = categoryId;
 	}
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

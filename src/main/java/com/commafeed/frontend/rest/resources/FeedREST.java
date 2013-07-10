@@ -33,6 +33,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -220,13 +222,18 @@ public class FeedREST extends AbstractResourceREST {
 		return Response.ok(writer.toString()).build();
 	}
 
-	private FeedInfo fetchFeedInternal(String url) {
+	private FeedInfo fetchFeedInternal(String url, String username, String password) {
 		FeedInfo info = null;
+        Credentials creds = null;
 		url = StringUtils.trimToEmpty(url);
 		url = prependHttp(url);
+
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            creds = new UsernamePasswordCredentials(username, password);
+        }
 		try {
 			FetchedFeed feed = feedFetcher.fetch(url, true, null, null, null,
-					null);
+					null, creds);
 			info = new FeedInfo();
 			info.setUrl(feed.getFeed().getUrl());
 			info.setTitle(feed.getTitle());
@@ -243,12 +250,14 @@ public class FeedREST extends AbstractResourceREST {
 	@Path("/fetch")
 	@ApiOperation(value = "Fetch a feed", notes = "Fetch a feed by its url", responseClass = "com.commafeed.frontend.model.FeedInfo")
 	public Response fetchFeed(
-			@ApiParam(value = "the feed's url", required = true) @QueryParam("url") String url) {
+			@ApiParam(value = "the feed's url", required = true) @QueryParam("url") String url,
+            @ApiParam(value = "the feed's username", required = false) @QueryParam("username") String username,
+            @ApiParam(value = "the feed's password", required = false) @QueryParam("password") String password) {
 		Preconditions.checkNotNull(url);
 
 		FeedInfo info = null;
 		try {
-			info = fetchFeedInternal(url);
+			info = fetchFeedInternal(url, username, password);
 		} catch (Exception e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR)
 					.entity(e.getMessage()).build();
@@ -368,14 +377,14 @@ public class FeedREST extends AbstractResourceREST {
 
 		String url = prependHttp(req.getUrl());
 		try {
-			url = fetchFeedInternal(url).getUrl();
+			url = fetchFeedInternal(url, req.getUsername(), req.getPassword()).getUrl();
 
 			FeedCategory category = CategoryREST.ALL
 					.equals(req.getCategoryId()) ? null : feedCategoryDAO
 					.findById(Long.valueOf(req.getCategoryId()));
-			FeedInfo info = fetchFeedInternal(url);
+			FeedInfo info = fetchFeedInternal(url, req.getUsername(), req.getPassword());
 			feedSubscriptionService.subscribe(getUser(), info.getUrl(),
-					req.getTitle(), category);
+                    req.getTitle(), req.getUsername(), req.getPassword(), category);
 		} catch (Exception e) {
 			log.info("Failed to subscribe to URL {}: {}", url, e.getMessage());
 			return Response
@@ -391,17 +400,19 @@ public class FeedREST extends AbstractResourceREST {
 	@Path("/subscribe")
 	@ApiOperation(value = "Subscribe to a feed", notes = "Subscribe to a feed")
 	public Response subscribe(
-			@ApiParam(value = "feed url", required = true) @QueryParam("url") String url) {
+			@ApiParam(value = "feed url", required = true) @QueryParam("url") String url,
+            @ApiParam(value = "feed username", required = false) @QueryParam("url") String username,
+            @ApiParam(value = "feed password", required = false) @QueryParam("url") String password) {
 
 		try {
 			Preconditions.checkNotNull(url);
 
 			url = prependHttp(url);
-			url = fetchFeedInternal(url).getUrl();
+			url = fetchFeedInternal(url, null, null).getUrl();
 
-			FeedInfo info = fetchFeedInternal(url);
+			FeedInfo info = fetchFeedInternal(url, null, null);
 			feedSubscriptionService.subscribe(getUser(), info.getUrl(),
-					info.getTitle(), null);
+					info.getTitle(), username, password, null);
 		} catch (Exception e) {
 			log.info("Could not subscribe to url {} : {}", url, e.getMessage());
 		}

@@ -12,6 +12,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -89,6 +91,18 @@ public class Feed extends AbstractModel {
 	 */
 	@Column(length = 64)
 	private String lastModifiedHeader;
+
+    /**
+     * BASIC auth username
+     */
+    @Column(length = 64)
+    private String username;
+
+    /**
+     * BASIC auth password
+     */
+    @Column(length = 64)
+    private String password;
 
 	/**
 	 * http header returned by the feed
@@ -333,4 +347,15 @@ public class Feed extends AbstractModel {
 		this.entryRelationships = entryRelationships;
 	}
 
+    public Credentials getCredentials() {
+        return new UsernamePasswordCredentials(this.username, this.password);
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
